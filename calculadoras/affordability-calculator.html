@@ -12,6 +12,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
 <script type="application/ld+json">
 {
   "@context":"https://schema.org",
@@ -102,6 +105,17 @@ ul{list-style:none}
 @media(max-width:420px){.two{grid-template-columns:1fr}}
 
 .result{border:1px solid var(--line-2);border-radius:var(--r);position:sticky;top:calc(var(--hh) + 16px)}
+/* compact sticky bar shown only on mobile */
+.mobar{display:none}
+@media(max-width:900px){
+  .mobar{display:block;position:sticky;top:var(--hh);z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-2);margin:0 calc(-1*var(--s4));padding:var(--s3) var(--s4)}
+  .mobar__in{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+  .mobar__label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+  .mobar__big{font-family:var(--sans);font-size:1.9rem;font-weight:600;letter-spacing:-.02em;color:var(--forest);line-height:1;font-variant-numeric:tabular-nums}
+  .mobar__sub{font-size:.72rem;color:var(--ink-2);text-align:right}
+  .mobar__sub b{color:var(--ink)}
+  .result{display:none}   /* hide the tall panel on mobile; sticky bar replaces it */
+}
 .result__head{padding:var(--s5) var(--s5) 0}
 .result__label{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
 .result__big{font-size:clamp(2.8rem,6vw,3.6rem);letter-spacing:-.03em;line-height:1;color:var(--forest);margin-top:var(--s3)}
@@ -121,6 +135,23 @@ ul{list-style:none}
 .tagline.warn{display:block;background:#F6EEDC;color:var(--warn)}
 
 .block{padding-block:var(--s8);border-top:1px solid var(--line)}
+/* full-bleed contrast bands */
+.band{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band .block{border-top:none}
+.band--dark{background:var(--forest);border:none;color:#fff}
+.band--dark .block__head h2{color:#fff}
+.band--dark .prose h3{color:#fff}
+.band--dark .prose p{color:rgba(255,255,255,.72)}
+.band--dark .prose strong{color:#fff}
+/* highlight stat strip to break the text wall */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-block:var(--s6)}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--bg);padding:var(--s5)}
+.band .stat{background:var(--paper)}
+.stat__n{font-family:var(--sans);font-size:2rem;font-weight:600;letter-spacing:-.02em;color:var(--forest);font-variant-numeric:tabular-nums}
+.stat__l{font-size:.85rem;color:var(--ink-2);margin-top:4px}
+.pull{font-family:var(--serif);font-size:clamp(1.4rem,3.4vw,2rem);font-weight:500;line-height:1.3;letter-spacing:-.01em;color:var(--ink);max-width:24ch;margin-block:var(--s5)}
+.pull em{font-style:italic;color:var(--forest)}
 .block__head{margin-bottom:var(--s6)}
 .block__head h2{font-family:var(--serif);font-size:clamp(1.6rem,3.2vw,2.1rem);font-weight:500;letter-spacing:-.015em}
 .block__head p{color:var(--ink-2);margin-top:8px;max-width:60ch}
@@ -160,8 +191,26 @@ ul{list-style:none}
 .footer__lead{color:var(--ink-2);font-size:.92rem;max-width:30ch;margin-top:var(--s3)}
 .footer__bottom{margin-top:var(--s7);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--ink-3);font-size:.8rem}
 .footer__bottom b{color:var(--ink-2)}
+/* action buttons (PDF + WhatsApp) */
+.actions{display:flex;gap:var(--s3);padding:var(--s4) var(--s5) var(--s5)}
+@media(max-width:900px){.actions{padding-inline:0}}
+.abtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:var(--rc);font-size:.875rem;font-weight:600;border:1px solid var(--line-2);background:#fff;color:var(--ink);transition:.15s;cursor:pointer}
+.abtn:hover{background:var(--paper);border-color:var(--forest)}
+.abtn svg{width:17px;height:17px}
+.abtn--wa{background:#25D366;border-color:#25D366;color:#fff}
+.abtn--wa:hover{background:#1EBE5A;border-color:#1EBE5A}
+.abtn[disabled]{opacity:.6;cursor:wait}
 :focus-visible{outline:2px solid var(--forest);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.footer{background:var(--forest);color:#fff;padding-block:var(--s8) var(--s6);border-top:none;margin-top:var(--s8)}
+.footer .brand{color:#fff}
+.footer .brand em{color:#9DC3B0}
+.footer h4{color:rgba(255,255,255,.5)}
+.footer a{color:rgba(255,255,255,.75)}
+.footer a:hover{color:#fff}
+.footer__lead{color:rgba(255,255,255,.7)}
+.footer__bottom{border-top-color:rgba(255,255,255,.15);color:rgba(255,255,255,.5)}
+.footer__bottom b{color:rgba(255,255,255,.8)}
 </style>
 </head>
 <body>
@@ -186,6 +235,20 @@ ul{list-style:none}
   <a href="../index.html">Home</a><span>/</span><a href="../index.html#tools">Calculators</a><span>/</span>Affordability
 </nav>
 
+<!-- MOBILE STICKY RESULT BAR -->
+<div class="mobar">
+  <div class="container mobar__in">
+    <div>
+      <div class="mobar__label">You can afford</div>
+      <div class="mobar__big num" id="moPrice">$404,740</div>
+    </div>
+    <div class="mobar__sub">
+      <div><b class="num" id="moPay">$2,700</b>/mo max</div>
+      <div><b class="num" id="moDti">36%</b> DTI</div>
+    </div>
+  </div>
+</div>
+
 <main class="container">
   <div class="phead">
     <span class="kicker">Free · US market</span>
@@ -197,17 +260,17 @@ ul{list-style:none}
     <div>
       <div class="field">
         <div class="field__top"><label class="field__label" for="incN">Annual household income</label><span class="field__val num" id="incV">$110,000</span></div>
-        <div class="inp"><span class="inp__pre">$</span><input type="number" id="incN" value="110000" min="0" max="2000000" step="1000"></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="incN" value="110,000"></div>
         <input type="range" class="range" id="incR" value="110000" min="20000" max="500000" step="1000" aria-label="Annual income">
       </div>
       <div class="field">
         <div class="field__top"><label class="field__label" for="debtN">Monthly debts</label><span class="field__hint">car, student, credit cards</span></div>
-        <div class="inp"><span class="inp__pre">$</span><input type="number" id="debtN" value="600" min="0" max="50000" step="25"></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="debtN" value="600"></div>
         <input type="range" class="range" id="debtR" value="600" min="0" max="6000" step="25" aria-label="Monthly debts">
       </div>
       <div class="field">
         <div class="field__top"><label class="field__label" for="dpN">Down payment</label><span class="field__hint">cash available</span></div>
-        <div class="inp"><span class="inp__pre">$</span><input type="number" id="dpN" value="60000" min="0" max="2000000" step="1000"></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="dpN" value="60,000"></div>
         <input type="range" class="range" id="dpR" value="60000" min="0" max="400000" step="1000" aria-label="Down payment">
       </div>
       <div class="two">
@@ -227,7 +290,7 @@ ul{list-style:none}
         </div>
         <div class="field">
           <div class="field__top"><label class="field__label" for="insN">Insurance</label><span class="field__hint">$ / year</span></div>
-          <div class="inp"><span class="inp__pre">$</span><input type="number" id="insN" value="1800" min="0" max="50000" step="50"></div>
+          <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="insN" value="1,800"></div>
         </div>
       </div>
       <div class="field">
@@ -237,7 +300,7 @@ ul{list-style:none}
     </div>
 
     <div>
-      <div class="result">
+      <div class="result" id="resultCard">
         <div class="result__head">
           <span class="result__label">You can afford a home up to</span>
           <div class="result__big num" id="priceOut">$404,740</div>
@@ -256,31 +319,61 @@ ul{list-style:none}
           <div class="tagline" id="tag"></div>
         </div>
       </div>
+      <div class="actions">
+        <button class="abtn" id="pdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Download PDF
+        </button>
+        <button class="abtn abtn--wa" id="waBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.5 15.3L2 22l4.8-1.5A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-2.8.9.9-2.8-.2-.3A8 8 0 1 1 12 20zm4.5-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1-.2.2-.6.8-.7.9-.1.2-.3.2-.5.1-.7-.3-1.3-.6-1.9-1.4-.4-.5-.1-.5.2-1 .1-.1.1-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.5-1.3-.7-1.7-.2-.4-.4-.4-.5-.4h-.5c-.2 0-.4.1-.6.3-.2.2-.8.8-.8 1.9s.8 2.2.9 2.4c.1.2 1.6 2.5 4 3.4 1.4.5 1.9.6 2.6.5.4-.1 1.4-.6 1.6-1.1.2-.5.2-1 .1-1.1-.1-.1-.2-.1-.4-.2z"/></svg>
+          Share
+        </button>
+      </div>
     </div>
   </section>
 
   <div class="ad">Advertisement</div>
 
+  <!-- pull quote to break rhythm -->
+  <section class="block" style="border-top:none;padding-bottom:0">
+    <p class="pull">Qualifying for a loan and <em>comfortably affording it</em> are two different numbers.</p>
+  </section>
+
+  <!-- key rules of thumb as stats -->
+  <section class="block" style="border-top:none;padding-top:var(--s5)">
+    <div class="stats">
+      <div class="stat"><div class="stat__n num">28%</div><div class="stat__l">Max income on housing (front-end)</div></div>
+      <div class="stat"><div class="stat__n num">36%</div><div class="stat__l">Max income on total debt (back-end)</div></div>
+      <div class="stat"><div class="stat__n num">43%</div><div class="stat__l">Common ceiling for approval</div></div>
+    </div>
+  </section>
+
   <section class="block">
     <div class="prose">
       <h3>How much house can I afford?</h3>
       <p>Lenders decide how much you can borrow using your <strong>debt-to-income ratio (DTI)</strong> — the share of your gross monthly income that goes toward debt. This calculator works backward from that limit: it finds the largest monthly housing payment your income can support, then converts it into a maximum home price for your rate, term and down payment.</p>
-
-      <h3>The 28/36 rule</h3>
-      <p>A common guideline is the <strong>28/36 rule</strong>: spend no more than 28% of gross monthly income on housing, and no more than 36% on total debt including housing. Many loan programs allow higher back-end ratios — FHA loans sometimes go to 43% or beyond — but staying near 36% leaves more room in your budget.</p>
       <div class="formula">Max housing payment = (Income ÷ 12 × DTI) − Monthly debts
         <small>The remaining payment is split into principal, interest, taxes and insurance, then reverse-engineered into a loan amount and home price.</small>
       </div>
-
       <h3>What counts as monthly debt?</h3>
       <p>Include recurring obligations that appear on your credit report: car loans, student loans, minimum credit-card payments, personal loans and child support. Everyday expenses like groceries, utilities and subscriptions are <strong>not</strong> counted in DTI, even though they still affect your real budget.</p>
-
-      <h3>Affordable isn't the same as comfortable</h3>
-      <p>Qualifying for a loan and comfortably affording it are different things. This tool shows the lender's ceiling — your own comfort level may be lower once you factor in savings, retirement, travel and emergencies. Treat the result as a maximum, not a target.</p>
     </div>
   </section>
 
-  <section class="block faq" id="faq">
+  </main>
+
+  <!-- dark contrast band (full-bleed) -->
+  <div class="band band--dark">
+    <div class="container"><section class="block">
+      <div class="prose">
+        <h3>The 28/36 rule, explained</h3>
+        <p>A common guideline is the <strong>28/36 rule</strong>: spend no more than 28% of gross monthly income on housing, and no more than 36% on total debt including housing. Many loan programs allow higher back-end ratios — FHA loans sometimes reach 43% or beyond — but staying near 36% leaves real room in your monthly budget.</p>
+        <p>The tool above shows the lender's ceiling. Your own comfort level may sit lower once you factor in savings, retirement, travel and emergencies. Treat the result as a <strong>maximum, not a target</strong>.</p>
+      </div>
+    </section></div>
+  </div>
+
+  <div class="band"><div class="container"><section class="block faq" id="faq">
     <div class="block__head"><h2>Frequently asked questions</h2></div>
     <details open>
       <summary>What is a debt-to-income ratio?</summary>
@@ -306,9 +399,10 @@ ul{list-style:none}
       <summary>Is this financial advice?</summary>
       <p>No. This tool is for informational purposes only. Your actual approval depends on your credit, employment, assets and lender guidelines. Confirm figures with a licensed professional.</p>
     </details>
-  </section>
+  </section></div></div>
 
-  <section class="block">
+  <main class="container">
+  <section class="block" style="border-top:none">
     <div class="block__head"><h2>Related calculators</h2></div>
     <div class="rel">
       <a href="mortgage-calculator.html"><h4>Mortgage</h4><p>Estimate the full monthly payment on a specific home price.</p></a>
@@ -353,7 +447,9 @@ ul{list-style:none}
   var fmt=function(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n)};
   var incN=$('incN'),incR=$('incR'),debtN=$('debtN'),debtR=$('debtR'),dpN=$('dpN'),dpR=$('dpR'),
       rateN=$('rateN'),termN=$('termN'),taxN=$('taxN'),insN=$('insN'),dtiR=$('dtiR');
-  function num(el,d){var v=parseFloat(el.value);return isNaN(v)?d:v;}
+  function num(el,d){var v=parseFloat(String(el.value).replace(/,/g,''));return isNaN(v)?d:v;}
+  function formatMoney(el){var raw=String(el.value).replace(/[^\d]/g,'');if(raw===''){el.value='';return;}var atEnd=el.selectionStart===el.value.length;el.value=Number(raw).toLocaleString('en-US');if(atEnd){try{el.selectionStart=el.selectionEnd=el.value.length;}catch(e){}}}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-money]'),function(el){el.addEventListener('input',function(){formatMoney(el);});});
 
   function compute(){
     var income=Math.max(0,num(incN,0)), debts=Math.max(0,num(debtN,0)), dp=Math.max(0,num(dpN,0));
@@ -399,6 +495,10 @@ ul{list-style:none}
     $('insOut').textContent=fmt(insM);
     $('realDti').textContent=Math.round(realDti)+'%';
     $('limitLabel').textContent=Math.round(dti*100)+'%';
+    // mobile sticky bar
+    $('moPrice').textContent=fmt(price);
+    $('moPay').textContent=fmt(piti);
+    $('moDti').textContent=Math.round(realDti)+'%';
 
     // DTI bar
     var housingPct=income>0?Math.min(100,piti/monthlyIncome*100):0;
@@ -426,16 +526,48 @@ ul{list-style:none}
   }
 
   incN.addEventListener('input',compute);
-  incR.addEventListener('input',function(){incN.value=+incR.value;compute();});
+  incR.addEventListener('input',function(){incN.value=Number(incR.value).toLocaleString('en-US');compute();});
   debtN.addEventListener('input',compute);
-  debtR.addEventListener('input',function(){debtN.value=+debtR.value;compute();});
+  debtR.addEventListener('input',function(){debtN.value=Number(debtR.value).toLocaleString('en-US');compute();});
   dpN.addEventListener('input',compute);
-  dpR.addEventListener('input',function(){dpN.value=+dpR.value;compute();});
+  dpR.addEventListener('input',function(){dpN.value=Number(dpR.value).toLocaleString('en-US');compute();});
   [rateN,termN,taxN,insN,dtiR].forEach(function(el){el.addEventListener('input',compute);});
 
   var b=document.querySelector('.burger'),nav=document.querySelector('.nav');
   if(b&&nav){b.addEventListener('click',function(){var o=nav.classList.toggle('open');b.setAttribute('aria-expanded',o)});}
   $('year').textContent=new Date().getFullYear();
+
+  // --- PDF download (visual capture of the result card) ---
+  (function(){
+   var pdfBtn=document.getElementById('pdfBtn');
+   if(pdfBtn){pdfBtn.addEventListener('click',function(){
+    if(typeof html2canvas==='undefined'||!window.jspdf){alert('Preparing tools, please try again in a moment.');return;}
+    pdfBtn.disabled=true; var label=pdfBtn.innerHTML; pdfBtn.textContent='Generating…';
+    var card=document.getElementById('resultCard');
+    html2canvas(card,{scale:2,backgroundColor:'#ffffff'}).then(function(canvas){
+      var img=canvas.toDataURL('image/png');
+      var pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+      var pw=pdf.internal.pageSize.getWidth(); var margin=40, maxW=pw-margin*2;
+      var ratio=canvas.height/canvas.width; var imgW=maxW, imgH=maxW*ratio;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(20,23,26);
+      pdf.text('RealEstateTools — Affordability estimate',margin,50);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,120);
+      pdf.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),margin,66);
+      pdf.addImage(img,'PNG',margin,84,imgW,imgH);
+      pdf.setFontSize(8); pdf.setTextColor(140,140,140);
+      pdf.text('For informational purposes only. Not financial advice. realestatetools.com',margin,84+imgH+24);
+      pdf.save('affordability-estimate.pdf'); pdfBtn.disabled=false; pdfBtn.innerHTML=label;
+    }).catch(function(){pdfBtn.disabled=false; pdfBtn.innerHTML=label; alert('Could not generate the PDF.');});
+   });}
+   var waBtn=document.getElementById('waBtn');
+   if(waBtn){waBtn.addEventListener('click',function(){
+    var g=function(id){var e=document.getElementById(id);return e?e.textContent.replace(/\\s+/g,' ').trim():'';};
+    var url=window.location.href.split('#')[0];
+    var msg='*Affordability estimate — RealEstateTools*\n\n'+'• You can afford up to: '+g('priceOut')+'\n'+'• Max monthly (PITI): '+g('payOut')+'\n'+'• Your DTI: '+g('realDti')+'\n\nRun your own numbers here:\n'+url;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+   });}
+  })();
+
   compute();
 })();
 </script>
