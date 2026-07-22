@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refinance Calculator — Break-Even Point &amp; Monthly Savings</title>
+<meta name="description" content="Free mortgage refinance calculator. See your new monthly payment, how much you'll save, your break-even point on closing costs, and lifetime interest savings — no signup.">
+<link rel="canonical" href="https://www.realestatetools.com/calculadoras/refinance-calculator.html">
+<meta property="og:title" content="Refinance Calculator — Break-Even Point & Monthly Savings">
+<meta property="og:description" content="Compare your current mortgage to a new one and find your break-even point on closing costs.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"Mortgage Refinance Calculator",
+  "applicationCategory":"FinanceApplication",
+  "operatingSystem":"Web",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Free refinance calculator that compares your current mortgage to a new loan, showing monthly savings, break-even point and lifetime interest savings."
+}
+</script>
+<style>
+:root{
+  --bg:#FFFFFF;--paper:#FAFAF9;--paper-2:#F3F3F1;
+  --ink:#14171A;--ink-2:#5C636B;--ink-3:#8B9198;
+  --line:#E4E5E4;--line-2:#D3D5D3;
+  --forest:#2E4B3C;--forest-2:#233A2E;--forest-soft:#EDF1ED;
+  --neg:#9B3B30;--neg-soft:#F7ECEB;--warn:#B5822E;
+  --k1:#2E4B3C;--k2:#6E8578;--k3:#A7B0AA;--k4:#DADDD8;
+  --r:4px;--rc:6px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:80px;
+  --sans:'Geist',system-ui,-apple-system,sans-serif;
+  --serif:'Bricolage Grotesque','Geist',sans-serif;
+  --steel:#3D5A6C;--steel-deep:#1D3D4D;--steel-soft:#5C7A88;--steel-bg:#F0F4F5;
+  --max:1160px;--hh:66px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+svg{display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+ul{list-style:none}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-weight:600}
+.container{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--s6)}
+@media(max-width:640px){.container{padding-inline:var(--s4)}}
+
+.header{position:sticky;top:0;z-index:50;height:var(--hh);background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header__in{height:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:2px;font-family:var(--serif);font-size:1.3rem;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.brand em{font-style:normal;color:var(--steel)}
+.nav{display:flex;align-items:center;gap:var(--s2)}
+.nav a{padding:6px 4px;font-size:.9rem;font-weight:500;color:var(--ink-2);transition:color .15s}
+.nav a:hover{color:var(--ink)}
+.nav__cta{margin-left:var(--s4);padding:9px 18px!important;background:var(--forest);color:#fff!important;border-radius:var(--rc);font-weight:600;font-size:.875rem!important}
+.nav__cta:hover{background:var(--forest-2)}
+.burger{display:none;width:40px;height:40px;align-items:center;justify-content:center;color:var(--ink)}
+@media(max-width:880px){
+  .nav{position:fixed;inset:var(--hh) 0 auto 0;flex-direction:column;align-items:stretch;gap:0;padding:var(--s3) var(--s4) var(--s4);background:#fff;border-bottom:1px solid var(--line);transform:translateY(-8px);opacity:0;pointer-events:none;transition:.2s}
+  .nav.open{transform:none;opacity:1;pointer-events:auto}
+  .nav a{padding:13px 0;border-bottom:1px solid var(--line)}
+  .nav__cta{margin:var(--s3) 0 0;text-align:center}
+  .burger{display:flex}
+}
+
+.crumb{padding-block:var(--s4);font-size:.82rem;color:var(--ink-3)}
+.crumb a{color:var(--ink-2)}
+.crumb a:hover{color:var(--forest)}
+.crumb span{margin-inline:8px}
+
+.phead{padding-bottom:var(--s6);border-bottom:1px solid var(--line)}
+.kicker{font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--forest)}
+.phead h1{font-family:var(--serif);font-size:clamp(2.2rem,4.6vw,3.1rem);font-weight:600;line-height:1.04;letter-spacing:-.025em;margin-top:var(--s3)}
+.phead p{color:var(--ink-2);margin-top:var(--s4);max-width:60ch;font-size:1.05rem}
+
+/* mobile sticky bar */
+.mobar{display:none}
+@media(max-width:900px){
+  .mobar{display:block;position:sticky;top:var(--hh);z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-2);margin:0 calc(-1*var(--s4));padding:var(--s3) var(--s4)}
+  .mobar__in{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+  .mobar__label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+  .mobar__big{font-family:var(--sans);font-size:1.9rem;font-weight:600;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+  .mobar__sub{font-size:.72rem;color:var(--ink-2);text-align:right}
+  .mobar__sub b{color:var(--ink)}
+}
+
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:var(--s8);padding-block:var(--s7)}
+@media(max-width:900px){.calc{grid-template-columns:1fr;gap:var(--s7)}}
+
+.sub{font-family:var(--serif);font-size:1.35rem;font-weight:500;margin-bottom:var(--s2)}
+.sub__note{font-size:.85rem;color:var(--ink-3);margin-bottom:var(--s4)}
+.grp{margin-bottom:var(--s6)}
+.field{padding-block:var(--s4);border-top:1px solid var(--line)}
+.field:first-child{border-top:none;padding-top:0}
+.field__top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;gap:var(--s3)}
+.field__label{font-size:.92rem;color:var(--ink-2)}
+.field__hint{font-size:.75rem;color:var(--ink-3)}
+.field__val{font-size:1rem;color:var(--ink)}
+.inp{position:relative;display:flex;align-items:center}
+.inp__pre{position:absolute;left:12px;color:var(--ink-3);font-size:.95rem;pointer-events:none}
+.inp__suf{position:absolute;right:12px;color:var(--ink-3);font-size:.9rem;pointer-events:none}
+.inp input{width:100%;padding:10px 12px 10px 24px;border:1px solid var(--line-2);border-radius:var(--rc);background:#fff;color:var(--ink);font-family:var(--sans);font-size:1rem;font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
+.inp input.suf{padding-right:34px}
+.inp input.plain{padding-left:12px}
+.inp input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px var(--forest-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+@media(max-width:420px){.two{grid-template-columns:1fr}}
+
+.result-sticky{position:sticky;top:calc(var(--hh) + 16px)}
+.result{border:1px solid var(--line-2);border-radius:var(--r)}
+.result__head{padding:var(--s5) var(--s5) 0}
+.result__label{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.result__big{font-size:clamp(2.6rem,5.5vw,3.4rem);letter-spacing:-.03em;line-height:1;margin-top:var(--s3)}
+.result__big .per{font-size:1rem;color:var(--ink-3);font-weight:500;margin-left:4px}
+.pos{color:var(--forest)}.negc{color:var(--neg)}
+.result__body{padding:var(--s5)}
+.brk__row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.brk__row:first-child{border-top:none}
+.brk__name{font-size:.88rem;color:var(--ink-2)}
+.brk__amt{font-size:.95rem;color:var(--steel-deep)}
+.result__foot{padding:var(--s4) var(--s5);border-top:1px solid var(--line-2);background:var(--paper);display:flex;flex-direction:column;gap:6px}
+.result__meta{font-size:.82rem;color:var(--ink-2);display:flex;justify-content:space-between}
+.result__meta b{color:var(--steel-deep)}
+.tagline{margin:var(--s4) var(--s5) 0;font-size:.82rem;padding:10px 12px;border-radius:var(--rc)}
+.tagline.ok{background:var(--forest-soft);color:var(--forest-2)}
+.tagline.warn{background:#F6EEDC;color:var(--warn)}
+.tagline.bad{background:var(--neg-soft);color:var(--neg)}
+.result__foot2{padding:0 var(--s5) var(--s5)}
+
+.band{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band .block{border-top:none}
+.band--dark{background:var(--forest);border:none;color:#fff}
+.band--dark .block__head h2{color:#fff}
+.band--dark .prose h3{color:#fff}
+.band--dark .prose p{color:rgba(255,255,255,.72)}
+.band--dark .prose strong{color:#fff}
+.band--dark .formula{background:rgba(255,255,255,.08);border-left-color:#fff;color:#fff}
+.band--dark .formula small{color:rgba(255,255,255,.7)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-block:var(--s6)}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--bg);padding:var(--s5)}
+.stat__n{font-family:var(--sans);font-size:2rem;font-weight:600;letter-spacing:-.02em;color:var(--forest);font-variant-numeric:tabular-nums}
+.stat__l{font-size:.85rem;color:var(--ink-2);margin-top:4px}
+.pull{font-family:var(--serif);font-size:clamp(1.4rem,3.4vw,2rem);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);max-width:26ch;margin-block:var(--s5)}
+.pull em{font-style:normal;color:var(--steel)}
+
+.block{padding-block:var(--s8);border-top:1px solid var(--line)}
+.block__head{margin-bottom:var(--s6)}
+.block__head h2{font-family:var(--serif);font-size:clamp(1.6rem,3.2vw,2.1rem);font-weight:600;letter-spacing:-.02em}
+.block__head p{color:var(--ink-2);margin-top:8px;max-width:60ch}
+
+.prose{max-width:70ch}
+.prose h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin-top:var(--s6);margin-bottom:var(--s3)}
+.prose h3:first-child{margin-top:0}
+.prose p{color:var(--ink-2);margin-bottom:var(--s4)}
+.prose strong{color:var(--ink);font-weight:600}
+.formula{border-left:2px solid var(--steel);background:var(--steel-bg);padding:var(--s4) var(--s5);margin-bottom:var(--s4);font-family:var(--sans);font-size:1rem;font-weight:500;color:var(--ink)}
+.formula small{display:block;font-family:var(--sans);font-size:.82rem;color:var(--ink-2);margin-top:8px;line-height:1.7}
+
+.faq details{border-top:1px solid var(--line);padding:var(--s4) 0}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{font-family:var(--serif);font-size:1.15rem;font-weight:600;letter-spacing:-.01em;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s4)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--forest);font-size:1.4rem;transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{color:var(--ink-2);margin-top:var(--s3);max-width:70ch}
+
+.rel{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+@media(max-width:720px){.rel{grid-template-columns:1fr}}
+.rel a{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);transition:.15s}
+.rel a:hover{border-color:var(--forest);background:var(--paper)}
+.rel h4{font-family:var(--serif);font-size:1.15rem;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.rel p{font-size:.88rem;color:var(--ink-2)}
+
+.ad{margin-block:var(--s6);display:grid;place-items:center;min-height:92px;border:1px solid var(--line);border-radius:var(--r);color:var(--ink-3);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase}
+
+.footer{background:var(--forest);color:#fff;padding-block:var(--s6) var(--s5);margin-top:var(--s8)}
+.footer__grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:var(--s5) var(--s6)}
+@media(max-width:640px){.footer__grid{grid-template-columns:1fr 1fr 1fr;gap:var(--s5) var(--s4)}.footer__brand{grid-column:1/-1}}
+.footer h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:var(--s3);font-weight:600}
+.footer a{color:rgba(255,255,255,.75);font-size:.9rem;display:block;padding:4px 0;transition:color .15s}
+.footer a:hover{color:#fff}
+.footer .brand{color:#fff}
+.footer .brand em{color:#9DC3B0}
+.footer__lead{color:rgba(255,255,255,.65);font-size:.88rem;max-width:32ch;margin-top:var(--s3);line-height:1.55}
+.footer__bottom{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:.78rem;line-height:1.5}
+.footer__bottom b{color:rgba(255,255,255,.8)}
+@keyframes growBar{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.bar-an{transform-box:fill-box;transform-origin:bottom;animation:growBar .6s cubic-bezier(.34,1.56,.64,1) backwards}
+@keyframes drawLine{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes fillGrow{from{width:0 !important}}
+@keyframes spinIn{from{transform:rotate(-25deg) scale(.85);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.bar-an{animation:none}}
+:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+/* action buttons (PDF + WhatsApp) */
+.actions{display:flex;gap:var(--s3);padding:var(--s4) var(--s5) var(--s5)}
+@media(max-width:900px){.actions{padding-inline:0}}
+.abtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 16px;border-radius:var(--rc);font-size:.9rem;font-weight:600;border:1.5px solid var(--line-2);background:#fff;color:var(--ink);transition:.15s;cursor:pointer;line-height:1}
+.abtn:hover{background:var(--forest);border-color:var(--forest);color:#fff}
+.abtn svg{width:18px;height:18px;flex-shrink:0}
+.abtn--wa{background:#25D366;border-color:#25D366;color:#fff}
+.abtn--wa:hover{background:#1DA851;border-color:#1DA851;color:#fff}
+.abtn[disabled]{opacity:.6;cursor:wait}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container header__in">
+    <a href="../index.html" class="brand" aria-label="RealEstateTools home">RealEstate<em>Tools</em></a>
+    <nav class="nav" aria-label="Main">
+      <a href="../index.html#tools">Calculators</a>
+      <a href="../guias/">Guides</a>
+      <a href="../blog/">Blog</a>
+      <a href="../glosario/">Glossary</a>
+      <a href="mortgage-calculator.html" class="nav__cta">Mortgage</a>
+    </nav>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="crumb container" aria-label="Breadcrumb">
+  <a href="../index.html">Home</a><span>/</span><a href="../index.html#tools">Calculators</a><span>/</span>Refinance
+</nav>
+
+<!-- MOBILE STICKY BAR -->
+<div class="mobar">
+  <div class="container mobar__in">
+    <div>
+      <div class="mobar__label">Monthly savings</div>
+      <div class="mobar__big pos num" id="moSave">$212</div>
+    </div>
+    <div class="mobar__sub">
+      <div>Break-even <b class="num" id="moBE">19 mo</b></div>
+      <div>New pay <b class="num" id="moPay">$1,708</b></div>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+  <div class="phead">
+    <span class="kicker">Free · US market</span>
+    <h1>Refinance Calculator</h1>
+    <p>Compare your current mortgage to a new loan. See how much you'll save each month, when you'll break even on closing costs, and your total savings over the life of the loan.</p>
+  </div>
+
+  <section class="calc">
+    <div>
+      <!-- CURRENT LOAN -->
+      <div class="grp">
+        <div class="sub">Current loan</div>
+        <div class="sub__note">What you have today.</div>
+        <div class="field">
+          <div class="field__top"><label class="field__label" for="balN">Remaining balance</label></div>
+          <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="balN" value="280,000"></div>
+        </div>
+        <div class="two">
+          <div class="field">
+            <div class="field__top"><label class="field__label" for="curRateN">Current rate</label></div>
+            <div class="inp"><input type="number" class="suf" id="curRateN" value="7.25" min="0" max="15" step="0.05"><span class="inp__suf">%</span></div>
+          </div>
+          <div class="field">
+            <div class="field__top"><label class="field__label" for="curLeftN">Years left</label></div>
+            <div class="inp"><input type="number" class="plain" id="curLeftN" value="27" min="1" max="40" step="1"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NEW LOAN -->
+      <div class="grp">
+        <div class="sub">New loan</div>
+        <div class="sub__note">The refinance you're considering.</div>
+        <div class="two">
+          <div class="field" style="border-top:none">
+            <div class="field__top"><label class="field__label" for="newRateN">New rate</label></div>
+            <div class="inp"><input type="number" class="suf" id="newRateN" value="6.00" min="0" max="15" step="0.05"><span class="inp__suf">%</span></div>
+          </div>
+          <div class="field" style="border-top:none">
+            <div class="field__top"><label class="field__label" for="newTermN">New term</label><span class="field__hint">years</span></div>
+            <div class="inp"><input type="number" class="plain" id="newTermN" value="30" min="1" max="40" step="1"></div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="field__top"><label class="field__label" for="costN">Closing costs</label><span class="field__hint">fees to refinance</span></div>
+          <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="costN" value="4,000"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="result-sticky">
+      <div class="result" id="resultCard">
+        <div class="result__head">
+          <span class="result__label">Monthly savings</span>
+          <div class="result__big pos num" id="saveOut">$212<span class="per">/mo</span></div>
+        </div>
+        <div class="tagline ok" id="tag">You'll break even on your closing costs in about 19 months.</div>
+        <div class="result__body">
+          <div class="brk__row"><span class="brk__name">Current payment (P&amp;I)</span><span class="brk__amt num" id="curPayOut">$1,920</span></div>
+          <div class="brk__row"><span class="brk__name">New payment (P&amp;I)</span><span class="brk__amt num" id="newPayOut">$1,708</span></div>
+          <div class="brk__row"><span class="brk__name">Break-even point</span><span class="brk__amt num" id="beOut">19 months</span></div>
+        </div>
+        <div class="result__foot">
+          <span class="result__meta">Interest left on current loan <b class="num" id="curIntOut">$342,600</b></span>
+          <span class="result__meta">Interest on new loan <b class="num" id="newIntOut">$334,880</b></span>
+          <span class="result__meta">Lifetime interest savings <b class="num" id="lifeOut">$7,720</b></span>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="abtn" id="pdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v4a1 1 0 0 0 1 1h4M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13h6M9 17h4" stroke-linecap="round"/></svg>
+          Download PDF
+        </button>
+        <button class="abtn abtn--wa" id="waBtn" type="button">
+          <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.004 0h-.008C7.174 0 .003 7.173.003 16c0 3.5 1.128 6.744 3.046 9.377L1.05 31.28l6.106-1.953A15.9 15.9 0 0 0 16.004 32C24.83 32 32 24.826 32 16S24.83 0 16.004 0zm9.318 22.594c-.386 1.09-1.918 1.994-3.14 2.258-.836.178-1.928.32-5.604-1.204-4.7-1.946-7.726-6.72-7.962-7.03-.226-.31-1.9-2.53-1.9-4.826s1.166-3.42 1.636-3.9c.386-.394.98-.574 1.55-.574.184 0 .35.01.5.017.446.02.67.046.964.748.366.882 1.256 3.078 1.362 3.302.108.224.216.526.064.836-.142.32-.268.454-.492.71-.226.256-.44.454-.664.73-.204.24-.434.498-.174.946.26.44 1.156 1.906 2.48 3.086 1.708 1.522 3.11 1.994 3.606 2.202.37.154.81.118 1.08-.17.342-.37.764-.984 1.194-1.59.304-.434.69-.488 1.094-.336.412.144 2.598 1.226 3.046 1.45.448.222.744.33.854.516.108.186.108 1.072-.278 2.162z"/></svg>
+          Share
+        </button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ad">Advertisement</div>
+</main>
+
+<!-- pull quote -->
+<div class="container">
+  <section class="block" style="border-top:none;padding-bottom:0">
+    <p class="pull">A lower rate only pays off if you <em>stay long enough</em> to clear the closing costs.</p>
+  </section>
+</div>
+
+<!-- stats -->
+<div class="container">
+  <section class="block" style="border-top:none;padding-top:var(--s5)">
+    <div class="stats">
+      <div class="stat"><div class="stat__n num" id="s1">$212</div><div class="stat__l">Saved every month</div></div>
+      <div class="stat"><div class="stat__n num" id="s2">19</div><div class="stat__l">Months to break even</div></div>
+      <div class="stat"><div class="stat__n num" id="s3">$7,720</div><div class="stat__l">Lifetime interest saved</div></div>
+    </div>
+  </section>
+</div>
+
+<!-- dark band -->
+<div class="band band--dark">
+  <div class="container"><section class="block">
+    <div class="prose" style="max-width:34ch">
+      <p class="pull" style="color:#fff;margin:0">The break-even point is the <em style="color:var(--k3)">real</em> decision.</p>
+      <p style="margin-top:var(--s4)">If you plan to sell or move before you reach it, refinancing costs you money even at a lower rate. If you'll stay well past it, the savings are yours to keep.</p>
+    </div>
+  </section></div>
+</div>
+
+<main class="container">
+  <section class="block" style="border-top:none">
+    <div class="prose">
+      <h3>How the refinance calculator works</h3>
+      <p>Refinancing replaces your current mortgage with a new one, ideally at a lower rate. This tool compares the monthly principal-and-interest payment on both loans, then measures how long it takes your monthly savings to repay the closing costs — your <strong>break-even point</strong>.</p>
+      <div class="formula">Break-even (months) = Closing costs ÷ Monthly savings
+        <small>If closing costs are $4,000 and you save $212 a month, you break even in about 19 months. After that, the savings are real money in your pocket.</small>
+      </div>
+      <h3>Watch the loan term</h3>
+      <p>Refinancing a loan with 27 years left into a fresh 30-year term lowers your payment, but it also <strong>restarts the clock</strong>. A lower rate can still mean more total interest if you stretch the term back out. This calculator shows lifetime interest for both loans so you can see the full picture, not just the monthly number.</p>
+      <h3>When refinancing usually makes sense</h3>
+      <p>A common rule of thumb is that refinancing is worth considering when you can lower your rate by roughly <strong>0.5 to 1 percentage point</strong> and you'll stay in the home past the break-even point. Cash-out refinances, removing PMI, or switching from an adjustable to a fixed rate are other common reasons.</p>
+    </div>
+  </section>
+</main>
+
+<!-- FAQ on light band -->
+<div class="band"><div class="container"><section class="block faq" id="faq">
+  <div class="block__head"><h2>Frequently asked questions</h2></div>
+  <details open>
+    <summary>What is a break-even point?</summary>
+    <p>It's the number of months it takes for your monthly savings to repay the closing costs of refinancing. Before that point you're still recovering fees; after it, the savings are yours.</p>
+  </details>
+  <details>
+    <summary>Does a lower rate always save money?</summary>
+    <p>Not always. If you extend the term or plan to move before breaking even, a lower rate can still cost you more overall. Look at both the break-even point and the lifetime interest figures shown above.</p>
+  </details>
+  <details>
+    <summary>What are typical closing costs to refinance?</summary>
+    <p>Refinance closing costs usually run about 2% to 5% of the loan amount, covering the appraisal, origination, title and other fees. Some lenders offer "no-closing-cost" refinances that fold the fees into a higher rate.</p>
+  </details>
+  <details>
+    <summary>Should I refinance into a shorter term?</summary>
+    <p>A shorter term, like moving from 30 to 15 years, usually raises your monthly payment but sharply cuts total interest and builds equity faster. Try both terms above to compare.</p>
+  </details>
+  <details>
+    <summary>Is this financial advice?</summary>
+    <p>No. This tool is for informational purposes only. Your actual rate, fees and eligibility depend on your lender and financial profile. Confirm figures with a licensed professional.</p>
+  </details>
+</section></div></div>
+
+<main class="container">
+  <section class="block" style="border-top:none">
+    <div class="block__head"><h2>Related calculators</h2></div>
+    <div class="rel">
+      <a href="mortgage-calculator.html"><h4>Mortgage</h4><p>Estimate the full monthly payment on a home, including taxes and PMI.</p></a>
+      <a href="affordability-calculator.html"><h4>Affordability</h4><p>See how much house you can afford from your income and debts.</p></a>
+      <a href="rent-vs-buy.html"><h4>Rent vs buy</h4><p>Compare the true cost of renting against owning over ten years.</p></a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+  <div class="footer__grid">
+    <div>
+      <a href="../index.html" class="brand">RealEstate<em>Tools</em></a>
+      <p class="footer__lead">Free calculators and clear resources for smarter US real estate decisions.</p>
+    </div>
+    <div><h4>Calculators</h4>
+      <a href="mortgage-calculator.html">Mortgage</a>
+      <a href="affordability-calculator.html">Affordability</a>
+      <a href="refinance-calculator.html">Refinance</a>
+      <a href="rent-vs-buy.html">Rent vs buy</a>
+    </div>
+    <div><h4>Resources</h4>
+      <a href="../guias/">Guides</a>
+      <a href="../blog/">Blog</a>
+      <a href="../glosario/">Glossary</a>
+    </div>
+    <div><h4>Legal</h4>
+      <a href="../legal/privacy-policy.html">Privacy Policy</a>
+      <a href="../legal/terms-of-use.html">Terms of Use</a>
+      <a href="../legal/disclaimer.html">Disclaimer</a>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <p><b>Disclaimer:</b> These calculators are for informational purposes only and do not constitute financial, legal, or tax advice. Consult a qualified professional before making financial decisions.</p>
+    <p style="margin-top:6px">© <span id="year">2026</span> RealEstateTools. All rights reserved.</p>
+  </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n)};
+  var _moneyPrev={};
+  function animateMoney(el,target,suffixHTML){
+    if(!el)return;
+    var key=el.id||'x'; var start=_moneyPrev[key]||0; _moneyPrev[key]=target;
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches){el.innerHTML=fmt(target)+(suffixHTML||'');return;}
+    var dur=600,t0=null;
+    function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);var e=1-Math.pow(1-p,3);el.innerHTML=fmt(Math.round(start+(target-start)*e))+(suffixHTML||'');if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+
+  function num(el,d){var v=parseFloat(String(el.value).replace(/,/g,''));return isNaN(v)?d:v;}
+  function formatMoney(el){var raw=String(el.value).replace(/[^\d]/g,'');if(raw===''){el.value='';return;}var atEnd=el.selectionStart===el.value.length;el.value=Number(raw).toLocaleString('en-US');if(atEnd){try{el.selectionStart=el.selectionEnd=el.value.length;}catch(e){}}}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-money]'),function(el){el.addEventListener('input',function(){formatMoney(el);});});
+
+  function pay(bal,rate,years){var r=rate/100/12,n=Math.round(years*12);if(n<=0)return 0;return rate===0?bal/n:bal*(r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);}
+
+  var ids=['balN','curRateN','curLeftN','newRateN','newTermN','costN'];
+
+  function compute(){
+    var bal=num($('balN'),0);
+    var curRate=num($('curRateN'),0), curLeft=Math.max(1,num($('curLeftN'),1));
+    var newRate=num($('newRateN'),0), newTerm=Math.max(1,num($('newTermN'),1));
+    var cost=num($('costN'),0);
+
+    var curPay=pay(bal,curRate,curLeft);
+    var newPay=pay(bal,newRate,newTerm);
+    var save=curPay-newPay;
+
+    var curInt=curPay*Math.round(curLeft*12)-bal;
+    var newInt=newPay*Math.round(newTerm*12)-bal;
+    var lifeSave=curInt-newInt;
+
+    var be = save>0 ? Math.ceil(cost/save) : Infinity;
+
+    // main number
+    var saveEl=$('saveOut');
+    saveEl.className='result__big num '+(save>=0?'pos':'negc');
+    animateMoney(saveEl,Math.abs(save),'<span class="per">/mo</span>'); if(save<0){saveEl.insertAdjacentText('afterbegin','−');}
+    $('curPayOut').textContent=fmt(curPay);
+    $('newPayOut').textContent=fmt(newPay);
+
+    var beTxt = be===Infinity ? 'Never' : (be+' month'+(be===1?'':'s'));
+    $('beOut').textContent=beTxt;
+    $('curIntOut').textContent=fmt(curInt);
+    $('newIntOut').textContent=fmt(newInt);
+    var lifeEl=$('lifeOut'); lifeEl.textContent=(lifeSave>=0?'':'−')+fmt(Math.abs(lifeSave));
+    lifeEl.style.color = lifeSave>=0 ? 'var(--forest)' : 'var(--neg)';
+
+    // tagline logic
+    var tag=$('tag');
+    if(save<=0){
+      tag.className='tagline bad';
+      tag.textContent='At these terms the new payment is higher — refinancing would cost you money each month.';
+    }else if(be>60){
+      tag.className='tagline warn';
+      tag.textContent='Break-even takes '+beTxt+'. That only pays off if you stay in the home well beyond it.';
+    }else{
+      tag.className='tagline ok';
+      tag.textContent="You'll break even on your closing costs in about "+beTxt+".";
+    }
+
+    // stats + mobile bar
+    $('s1').textContent=fmt(Math.abs(save));
+    $('s2').textContent= be===Infinity ? '∞' : be;
+    $('s3').textContent=(lifeSave>=0?'':'−')+fmt(Math.abs(lifeSave));
+    $('moSave').textContent=(save>=0?'':'−')+fmt(Math.abs(save));
+    $('moSave').className='mobar__big num '+(save>=0?'pos':'negc');
+    $('moBE').textContent= be===Infinity ? '—' : (be+' mo');
+    $('moPay').textContent=fmt(newPay);
+  }
+
+  ids.forEach(function(id){$(id).addEventListener('input',compute);});
+
+  // --- PDF download (visual capture of the result card) ---
+  var pdfBtn=$('pdfBtn');
+  if(pdfBtn){pdfBtn.addEventListener('click',function(){
+    if(typeof html2canvas==='undefined'||!window.jspdf){alert('Preparing tools, please try again in a moment.');return;}
+    pdfBtn.disabled=true; var label=pdfBtn.innerHTML; pdfBtn.textContent='Generating…';
+    var card=document.getElementById('resultCard');
+    html2canvas(card,{scale:2,backgroundColor:'#ffffff'}).then(function(canvas){
+      var img=canvas.toDataURL('image/png');
+      var jsPDF=window.jspdf.jsPDF;
+      var pdf=new jsPDF({unit:'pt',format:'a4'});
+      var pw=pdf.internal.pageSize.getWidth();
+      var margin=40, maxW=pw-margin*2;
+      var ratio=canvas.height/canvas.width;
+      var imgW=maxW, imgH=maxW*ratio;
+      // title
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(20,23,26);
+      pdf.text('RealEstateTools — Refinance estimate',margin,50);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,120);
+      pdf.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),margin,66);
+      pdf.addImage(img,'PNG',margin,84,imgW,imgH);
+      var fy=84+imgH+24;
+      pdf.setFontSize(8); pdf.setTextColor(140,140,140);
+      pdf.text('For informational purposes only. Not financial advice. realestatetools.com',margin,fy);
+      pdf.save('refinance-estimate.pdf');
+      pdfBtn.disabled=false; pdfBtn.innerHTML=label;
+    }).catch(function(){pdfBtn.disabled=false; pdfBtn.innerHTML=label; alert('Could not generate the PDF.');});
+  });}
+
+  // --- WhatsApp share (summary + link) ---
+  var waBtn=$('waBtn');
+  if(waBtn){waBtn.addEventListener('click',function(){
+    var save=$('saveOut').textContent.replace(/\s+/g,' ').trim();
+    var be=$('beOut').textContent.trim();
+    var newPay=$('newPayOut').textContent.trim();
+    var life=$('lifeOut').textContent.trim();
+    var url=window.location.href.split('#')[0];
+    var msg='*Refinance estimate — RealEstateTools*\n\n'+
+      '• Monthly savings: '+save+'\n'+
+      '• New payment: '+newPay+'\n'+
+      '• Break-even: '+be+'\n'+
+      '• Lifetime interest saved: '+life+'\n\n'+
+      'Run your own numbers here:\n'+url;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+  });}
+  var b=document.querySelector('.burger'),nav=document.querySelector('.nav');
+  if(b&&nav){b.addEventListener('click',function(){var o=nav.classList.toggle('open');b.setAttribute('aria-expanded',o)});}
+  $('year').textContent=new Date().getFullYear();
+  compute();
+})();
+</script>
+</body>
+</html>

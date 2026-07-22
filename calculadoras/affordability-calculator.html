@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Affordability Calculator — How Much House Can I Afford?</title>
+<meta name="description" content="Find out how much house you can afford based on your income, debts, down payment and interest rate. Free affordability calculator using standard US DTI ratios — no signup.">
+<link rel="canonical" href="https://www.realestatetools.com/calculadoras/affordability-calculator.html">
+<meta property="og:title" content="Home Affordability Calculator — How Much House Can I Afford?">
+<meta property="og:description" content="Estimate your maximum home price from income, debts and down payment using standard DTI ratios.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<script type="application/ld+json">
+{
+  "@context":"https://schema.org",
+  "@type":"WebApplication",
+  "name":"Home Affordability Calculator",
+  "applicationCategory":"FinanceApplication",
+  "operatingSystem":"Web",
+  "offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},
+  "description":"Free home affordability calculator that estimates your maximum home price from income, debts and down payment using standard US DTI ratios."
+}
+</script>
+<style>
+:root{
+  --bg:#FFFFFF;--paper:#FAFAF9;--paper-2:#F3F3F1;
+  --ink:#14171A;--ink-2:#5C636B;--ink-3:#8B9198;
+  --line:#E4E5E4;--line-2:#D3D5D3;
+  --forest:#2E4B3C;--forest-2:#233A2E;--forest-soft:#EDF1ED;
+  --neg:#9B3B30;--warn:#B5822E;
+  --k1:#2E4B3C;--k2:#6E8578;--k3:#A7B0AA;--k4:#DADDD8;
+  --r:4px;--rc:6px;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:80px;
+  --sans:'Geist',system-ui,-apple-system,sans-serif;
+  --serif:'Bricolage Grotesque','Geist',sans-serif;
+  --steel:#3D5A6C;--steel-deep:#1D3D4D;--steel-soft:#5C7A88;--steel-bg:#F0F4F5;
+  --max:1160px;--hh:66px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+svg{display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+ul{list-style:none}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-weight:600}
+.container{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--s6)}
+@media(max-width:640px){.container{padding-inline:var(--s4)}}
+
+.header{position:sticky;top:0;z-index:50;height:var(--hh);background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.header__in{height:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:2px;font-family:var(--serif);font-size:1.3rem;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.brand em{font-style:normal;color:var(--steel)}
+.nav{display:flex;align-items:center;gap:var(--s2)}
+.nav a{padding:6px 4px;font-size:.9rem;font-weight:500;color:var(--ink-2);transition:color .15s}
+.nav a:hover{color:var(--ink)}
+.nav__cta{margin-left:var(--s4);padding:9px 18px!important;background:var(--forest);color:#fff!important;border-radius:var(--rc);font-weight:600;font-size:.875rem!important}
+.nav__cta:hover{background:var(--forest-2)}
+.burger{display:none;width:40px;height:40px;align-items:center;justify-content:center;color:var(--ink)}
+@media(max-width:880px){
+  .nav{position:fixed;inset:var(--hh) 0 auto 0;flex-direction:column;align-items:stretch;gap:0;padding:var(--s3) var(--s4) var(--s4);background:#fff;border-bottom:1px solid var(--line);transform:translateY(-8px);opacity:0;pointer-events:none;transition:.2s}
+  .nav.open{transform:none;opacity:1;pointer-events:auto}
+  .nav a{padding:13px 0;border-bottom:1px solid var(--line)}
+  .nav__cta{margin:var(--s3) 0 0;text-align:center}
+  .burger{display:flex}
+}
+
+.crumb{padding-block:var(--s4);font-size:.82rem;color:var(--ink-3)}
+.crumb a{color:var(--ink-2)}
+.crumb a:hover{color:var(--forest)}
+.crumb span{margin-inline:8px}
+
+.phead{padding-bottom:var(--s6);border-bottom:1px solid var(--line)}
+.kicker{font-size:.72rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--forest)}
+.phead h1{font-family:var(--serif);font-size:clamp(2.2rem,4.6vw,3.1rem);font-weight:600;line-height:1.04;letter-spacing:-.025em;margin-top:var(--s3)}
+.phead p{color:var(--ink-2);margin-top:var(--s4);max-width:60ch;font-size:1.05rem}
+
+.calc{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:var(--s8);padding-block:var(--s7)}
+@media(max-width:900px){.calc{grid-template-columns:1fr;gap:var(--s7)}}
+
+.field{padding-block:var(--s4);border-top:1px solid var(--line)}
+.field:first-child{border-top:none;padding-top:0}
+.field__top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;gap:var(--s3)}
+.field__label{font-size:.92rem;color:var(--ink-2)}
+.field__hint{font-size:.75rem;color:var(--ink-3)}
+.field__val{font-size:1rem;color:var(--ink)}
+.inp{position:relative;display:flex;align-items:center}
+.inp__pre{position:absolute;left:12px;color:var(--ink-3);font-size:.95rem;pointer-events:none}
+.inp__suf{position:absolute;right:12px;color:var(--ink-3);font-size:.9rem;pointer-events:none}
+.inp input{width:100%;padding:10px 12px 10px 24px;border:1px solid var(--line-2);border-radius:var(--rc);background:#fff;color:var(--ink);font-family:var(--sans);font-size:1rem;font-variant-numeric:tabular-nums;transition:border-color .15s,box-shadow .15s}
+.inp input.suf{padding-right:34px}
+.inp input.plain{padding-left:12px}
+.inp input:focus{outline:none;border-color:var(--forest);box-shadow:0 0 0 3px var(--forest-soft)}
+.range{-webkit-appearance:none;appearance:none;width:100%;height:2px;margin-top:14px;background:var(--line-2);cursor:pointer}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:15px;height:15px;border-radius:2px;background:var(--forest);border:0;transition:transform .1s}
+.range::-webkit-slider-thumb:hover{transform:scale(1.15)}
+.range::-moz-range-thumb{width:15px;height:15px;border:0;border-radius:2px;background:var(--forest)}
+.range:focus{outline:none}
+.range:focus::-webkit-slider-thumb{box-shadow:0 0 0 4px var(--forest-soft)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4)}
+@media(max-width:420px){.two{grid-template-columns:1fr}}
+
+.result-sticky{position:sticky;top:calc(var(--hh) + 16px)}
+.result{border:1px solid var(--line-2);border-radius:var(--r)}
+/* compact sticky bar shown only on mobile */
+.mobar{display:none}
+@media(max-width:900px){
+  .mobar{display:block;position:sticky;top:var(--hh);z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-2);margin:0 calc(-1*var(--s4));padding:var(--s3) var(--s4)}
+  .mobar__in{display:flex;align-items:center;justify-content:space-between;gap:var(--s3)}
+  .mobar__label{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+  .mobar__big{font-family:var(--sans);font-size:1.9rem;font-weight:600;letter-spacing:-.02em;color:var(--forest);line-height:1;font-variant-numeric:tabular-nums}
+  .mobar__sub{font-size:.72rem;color:var(--ink-2);text-align:right}
+  .mobar__sub b{color:var(--ink)}
+  .result-sticky{position:static}
+}
+.result__head{padding:var(--s5) var(--s5) 0}
+.result__label{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--steel)}
+.result__big{font-size:clamp(2.8rem,6vw,3.6rem);letter-spacing:-.03em;line-height:1;color:var(--forest);margin-top:var(--s3)}
+.result__note{font-size:.85rem;color:var(--ink-2);margin-top:var(--s3);padding:0 var(--s5)}
+.result__body{padding:var(--s5)}
+.brk__row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.brk__row:first-child{border-top:none}
+.brk__name{font-size:.88rem;color:var(--ink-2)}
+.brk__amt{font-size:.95rem;color:var(--steel-deep)}
+.result__foot{padding:var(--s4) var(--s5);border-top:1px solid var(--line-2);background:var(--paper)}
+.bar{height:8px;border-radius:2px;background:var(--paper-2);overflow:hidden;margin-top:6px;display:flex}
+.bar i{transition:width .7s cubic-bezier(.34,1.4,.64,1)}
+.bar i{height:100%;display:block}
+.dtiwrap{display:flex;justify-content:space-between;align-items:baseline;font-size:.82rem;color:var(--ink-2)}
+.dtiwrap b{color:var(--ink)}
+.tagline{margin-top:var(--s3);font-size:.82rem;padding:8px 12px;border-radius:var(--rc);display:none}
+.tagline.ok{display:block;background:var(--forest-soft);color:var(--forest-2)}
+.tagline.warn{display:block;background:#F6EEDC;color:var(--warn)}
+
+.block{padding-block:var(--s8);border-top:1px solid var(--line)}
+/* full-bleed contrast bands */
+.band{background:var(--paper);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.band .block{border-top:none}
+.band--dark{background:var(--forest);border:none;color:#fff}
+.band--dark .block__head h2{color:#fff}
+.band--dark .prose h3{color:#fff}
+.band--dark .prose p{color:rgba(255,255,255,.72)}
+.band--dark .prose strong{color:#fff}
+/* highlight stat strip to break the text wall */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-block:var(--s6)}
+@media(max-width:560px){.stats{grid-template-columns:1fr}}
+.stat{background:var(--bg);padding:var(--s5)}
+.band .stat{background:var(--paper)}
+.stat__n{font-family:var(--sans);font-size:2rem;font-weight:600;letter-spacing:-.02em;color:var(--forest);font-variant-numeric:tabular-nums}
+.stat__l{font-size:.85rem;color:var(--ink-2);margin-top:4px}
+.pull{font-family:var(--serif);font-size:clamp(1.4rem,3.4vw,2rem);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--ink);max-width:24ch;margin-block:var(--s5)}
+.pull em{font-style:normal;color:var(--steel)}
+.block__head{margin-bottom:var(--s6)}
+.block__head h2{font-family:var(--serif);font-size:clamp(1.6rem,3.2vw,2.1rem);font-weight:600;letter-spacing:-.02em}
+.block__head p{color:var(--ink-2);margin-top:8px;max-width:60ch}
+
+.prose{max-width:70ch}
+.prose h3{font-family:var(--serif);font-size:1.35rem;font-weight:600;letter-spacing:-.01em;margin-top:var(--s6);margin-bottom:var(--s3)}
+.prose h3:first-child{margin-top:0}
+.prose p{color:var(--ink-2);margin-bottom:var(--s4)}
+.prose strong{color:var(--ink);font-weight:600}
+.formula{border-left:2px solid var(--steel);background:var(--steel-bg);padding:var(--s4) var(--s5);margin-bottom:var(--s4);font-family:var(--sans);font-size:1rem;font-weight:500;color:var(--ink)}
+.formula small{display:block;font-family:var(--sans);font-size:.82rem;color:var(--ink-2);margin-top:8px;line-height:1.7}
+
+.faq details{border-top:1px solid var(--line);padding:var(--s4) 0}
+.faq details:last-child{border-bottom:1px solid var(--line)}
+.faq summary{font-family:var(--serif);font-size:1.15rem;font-weight:600;letter-spacing:-.01em;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:var(--s4)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--forest);font-size:1.4rem;transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{color:var(--ink-2);margin-top:var(--s3);max-width:70ch}
+
+.rel{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+@media(max-width:720px){.rel{grid-template-columns:1fr}}
+.rel a{border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);transition:.15s}
+.rel a:hover{border-color:var(--forest);background:var(--paper)}
+.rel h4{font-family:var(--serif);font-size:1.15rem;font-weight:600;letter-spacing:-.01em;margin-bottom:6px}
+.rel p{font-size:.88rem;color:var(--ink-2)}
+
+.ad{margin-block:var(--s6);display:grid;place-items:center;min-height:92px;border:1px solid var(--line);border-radius:var(--r);color:var(--ink-3);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase}
+
+/* action buttons (PDF + WhatsApp) */
+.actions{display:flex;gap:var(--s3);padding:var(--s4) var(--s5) var(--s5)}
+@media(max-width:900px){.actions{padding-inline:0}}
+.abtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 16px;border-radius:var(--rc);font-size:.9rem;font-weight:600;border:1.5px solid var(--line-2);background:#fff;color:var(--ink);transition:.15s;cursor:pointer;line-height:1}
+.abtn:hover{background:var(--forest);border-color:var(--forest);color:#fff}
+.abtn svg{width:18px;height:18px;flex-shrink:0}
+.abtn--wa{background:#25D366;border-color:#25D366;color:#fff}
+.abtn--wa:hover{background:#1DA851;border-color:#1DA851;color:#fff}
+.abtn[disabled]{opacity:.6;cursor:wait}
+.footer{background:var(--forest);color:#fff;padding-block:var(--s6) var(--s5);margin-top:var(--s8)}
+.footer__grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:var(--s5) var(--s6)}
+@media(max-width:640px){.footer__grid{grid-template-columns:1fr 1fr 1fr;gap:var(--s5) var(--s4)}.footer__brand{grid-column:1/-1}}
+.footer h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:var(--s3);font-weight:600}
+.footer a{color:rgba(255,255,255,.75);font-size:.9rem;display:block;padding:4px 0;transition:color .15s}
+.footer a:hover{color:#fff}
+.footer .brand{color:#fff}
+.footer .brand em{color:#9DC3B0}
+.footer__lead{color:rgba(255,255,255,.65);font-size:.88rem;max-width:32ch;margin-top:var(--s3);line-height:1.55}
+.footer__bottom{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:.78rem;line-height:1.5}
+.footer__bottom b{color:rgba(255,255,255,.8)}
+@keyframes growBar{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.bar-an{transform-box:fill-box;transform-origin:bottom;animation:growBar .6s cubic-bezier(.34,1.56,.64,1) backwards}
+@keyframes drawLine{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:0}}
+@keyframes fillGrow{from{width:0 !important}}
+@keyframes spinIn{from{transform:rotate(-25deg) scale(.85);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.bar-an{animation:none}}
+:focus-visible{outline:2px solid var(--forest);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container header__in">
+    <a href="../index.html" class="brand" aria-label="RealEstateTools home">RealEstate<em>Tools</em></a>
+    <nav class="nav" aria-label="Main">
+      <a href="../index.html#tools">Calculators</a>
+      <a href="../guias/">Guides</a>
+      <a href="../blog/">Blog</a>
+      <a href="../glosario/">Glossary</a>
+      <a href="mortgage-calculator.html" class="nav__cta">Mortgage</a>
+    </nav>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="crumb container" aria-label="Breadcrumb">
+  <a href="../index.html">Home</a><span>/</span><a href="../index.html#tools">Calculators</a><span>/</span>Affordability
+</nav>
+
+<!-- MOBILE STICKY RESULT BAR -->
+<div class="mobar">
+  <div class="container mobar__in">
+    <div>
+      <div class="mobar__label">You can afford</div>
+      <div class="mobar__big num" id="moPrice">$404,740</div>
+    </div>
+    <div class="mobar__sub">
+      <div><b class="num" id="moPay">$2,700</b>/mo max</div>
+      <div><b class="num" id="moDti">36%</b> DTI</div>
+    </div>
+  </div>
+</div>
+
+<main class="container">
+  <div class="phead">
+    <span class="kicker">Free · US market</span>
+    <h1>Home Affordability Calculator</h1>
+    <p>Estimate the maximum home price you can afford based on your income, monthly debts and down payment — using the debt-to-income ratios lenders actually apply.</p>
+  </div>
+
+  <section class="calc">
+    <div>
+      <div class="field">
+        <div class="field__top"><label class="field__label" for="incN">Annual household income</label><span class="field__val num" id="incV">$110,000</span></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="incN" value="110,000"></div>
+        <input type="range" class="range" id="incR" value="110000" min="20000" max="500000" step="1000" aria-label="Annual income">
+      </div>
+      <div class="field">
+        <div class="field__top"><label class="field__label" for="debtN">Monthly debts</label><span class="field__hint">car, student, credit cards</span></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="debtN" value="600"></div>
+        <input type="range" class="range" id="debtR" value="600" min="0" max="6000" step="25" aria-label="Monthly debts">
+      </div>
+      <div class="field">
+        <div class="field__top"><label class="field__label" for="dpN">Down payment</label><span class="field__hint">cash available</span></div>
+        <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="dpN" value="60,000"></div>
+        <input type="range" class="range" id="dpR" value="60000" min="0" max="400000" step="1000" aria-label="Down payment">
+      </div>
+      <div class="two">
+        <div class="field" style="border-top:none">
+          <div class="field__top"><label class="field__label" for="rateN">Interest rate</label></div>
+          <div class="inp"><input type="number" class="suf" id="rateN" value="6.5" min="0" max="15" step="0.05"><span class="inp__suf">%</span></div>
+        </div>
+        <div class="field" style="border-top:none">
+          <div class="field__top"><label class="field__label" for="termN">Term (years)</label></div>
+          <div class="inp"><input type="number" class="plain" id="termN" value="30" min="1" max="40" step="1"></div>
+        </div>
+      </div>
+      <div class="two">
+        <div class="field">
+          <div class="field__top"><label class="field__label" for="taxN">Property tax</label><span class="field__hint">% / year</span></div>
+          <div class="inp"><input type="number" class="suf" id="taxN" value="1.1" min="0" max="5" step="0.05"><span class="inp__suf">%</span></div>
+        </div>
+        <div class="field">
+          <div class="field__top"><label class="field__label" for="insN">Insurance</label><span class="field__hint">$ / year</span></div>
+          <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="insN" value="1,800"></div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field__top"><label class="field__label" for="dtiR">Max DTI ratio</label><span class="field__val num" id="dtiV">36%</span></div>
+        <input type="range" class="range" id="dtiR" value="36" min="28" max="50" step="1" aria-label="Max debt-to-income ratio">
+      </div>
+    </div>
+
+    <div>
+      <div class="result-sticky">
+      <div class="result" id="resultCard">
+        <div class="result__head">
+          <span class="result__label">You can afford a home up to</span>
+          <div class="result__big num" id="priceOut">$404,740</div>
+        </div>
+        <p class="result__note">With a <b class="num" id="dpNote">$60,000</b> down payment, that's a <b class="num" id="loanNote">$344,740</b> loan.</p>
+        <div class="result__body">
+          <div class="brk__row"><span class="brk__name">Max monthly payment (PITI)</span><span class="brk__amt num" id="payOut">$2,700</span></div>
+          <div class="brk__row"><span class="brk__name">Principal &amp; interest</span><span class="brk__amt num" id="piOut">$2,179</span></div>
+          <div class="brk__row"><span class="brk__name">Property tax</span><span class="brk__amt num" id="taxOut">$371</span></div>
+          <div class="brk__row"><span class="brk__name">Home insurance</span><span class="brk__amt num" id="insOut">$150</span></div>
+        </div>
+        <div class="result__foot">
+          <div class="dtiwrap"><span>Your debt-to-income</span><span><b class="num" id="realDti">36%</b> of income</span></div>
+          <div class="bar"><i id="barHousing" style="background:var(--k1);width:26%"></i><i id="barDebt" style="background:var(--steel);width:7%"></i></div>
+          <div class="dtiwrap" style="margin-top:6px;font-size:.75rem;color:var(--ink-3)"><span>Housing + other debt</span><span>Limit <b class="num" id="limitLabel">36%</b></span></div>
+          <div class="tagline" id="tag"></div>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="abtn" id="pdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v4a1 1 0 0 0 1 1h4M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13h6M9 17h4" stroke-linecap="round"/></svg>
+          Download PDF
+        </button>
+        <button class="abtn abtn--wa" id="waBtn" type="button">
+          <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.004 0h-.008C7.174 0 .003 7.173.003 16c0 3.5 1.128 6.744 3.046 9.377L1.05 31.28l6.106-1.953A15.9 15.9 0 0 0 16.004 32C24.83 32 32 24.826 32 16S24.83 0 16.004 0zm9.318 22.594c-.386 1.09-1.918 1.994-3.14 2.258-.836.178-1.928.32-5.604-1.204-4.7-1.946-7.726-6.72-7.962-7.03-.226-.31-1.9-2.53-1.9-4.826s1.166-3.42 1.636-3.9c.386-.394.98-.574 1.55-.574.184 0 .35.01.5.017.446.02.67.046.964.748.366.882 1.256 3.078 1.362 3.302.108.224.216.526.064.836-.142.32-.268.454-.492.71-.226.256-.44.454-.664.73-.204.24-.434.498-.174.946.26.44 1.156 1.906 2.48 3.086 1.708 1.522 3.11 1.994 3.606 2.202.37.154.81.118 1.08-.17.342-.37.764-.984 1.194-1.59.304-.434.69-.488 1.094-.336.412.144 2.598 1.226 3.046 1.45.448.222.744.33.854.516.108.186.108 1.072-.278 2.162z"/></svg>
+          Share
+        </button>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ad">Advertisement</div>
+
+  <!-- pull quote to break rhythm -->
+  <section class="block" style="border-top:none;padding-bottom:0">
+    <p class="pull">Qualifying for a loan and <em>comfortably affording it</em> are two different numbers.</p>
+  </section>
+
+  <!-- key rules of thumb as stats -->
+  <section class="block" style="border-top:none;padding-top:var(--s5)">
+    <div class="stats">
+      <div class="stat"><div class="stat__n num">28%</div><div class="stat__l">Max income on housing (front-end)</div></div>
+      <div class="stat"><div class="stat__n num">36%</div><div class="stat__l">Max income on total debt (back-end)</div></div>
+      <div class="stat"><div class="stat__n num">43%</div><div class="stat__l">Common ceiling for approval</div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="prose">
+      <h3>How much house can I afford?</h3>
+      <p>Lenders decide how much you can borrow using your <strong>debt-to-income ratio (DTI)</strong> — the share of your gross monthly income that goes toward debt. This calculator works backward from that limit: it finds the largest monthly housing payment your income can support, then converts it into a maximum home price for your rate, term and down payment.</p>
+      <div class="formula">Max housing payment = (Income ÷ 12 × DTI) − Monthly debts
+        <small>The remaining payment is split into principal, interest, taxes and insurance, then reverse-engineered into a loan amount and home price.</small>
+      </div>
+      <h3>What counts as monthly debt?</h3>
+      <p>Include recurring obligations that appear on your credit report: car loans, student loans, minimum credit-card payments, personal loans and child support. Everyday expenses like groceries, utilities and subscriptions are <strong>not</strong> counted in DTI, even though they still affect your real budget.</p>
+    </div>
+  </section>
+
+  </main>
+
+  <!-- dark contrast band (full-bleed) -->
+  <div class="band band--dark">
+    <div class="container"><section class="block">
+      <div class="prose">
+        <h3>The 28/36 rule, explained</h3>
+        <p>A common guideline is the <strong>28/36 rule</strong>: spend no more than 28% of gross monthly income on housing, and no more than 36% on total debt including housing. Many loan programs allow higher back-end ratios — FHA loans sometimes reach 43% or beyond — but staying near 36% leaves real room in your monthly budget.</p>
+        <p>The tool above shows the lender's ceiling. Your own comfort level may sit lower once you factor in savings, retirement, travel and emergencies. Treat the result as a <strong>maximum, not a target</strong>.</p>
+      </div>
+    </section></div>
+  </div>
+
+  <div class="band"><div class="container"><section class="block faq" id="faq">
+    <div class="block__head"><h2>Frequently asked questions</h2></div>
+    <details open>
+      <summary>What is a debt-to-income ratio?</summary>
+      <p>DTI is the percentage of your gross monthly income that goes toward debt payments. Lenders use it to judge whether you can take on a mortgage. A lower DTI generally means you can borrow more and qualify for better terms.</p>
+    </details>
+    <details>
+      <summary>What income should I enter?</summary>
+      <p>Use your gross annual household income before taxes — including salary, reliable bonuses and any co-borrower's income. Lenders qualify you on gross, not take-home, pay.</p>
+    </details>
+    <details>
+      <summary>Why does my down payment change how much I can afford?</summary>
+      <p>Your monthly payment sets the size of the loan you can carry. The down payment is added on top of that loan to reach the total home price — so more cash down means a higher price for the same monthly payment.</p>
+    </details>
+    <details>
+      <summary>Does a higher DTI limit mean I should borrow more?</summary>
+      <p>Not necessarily. A higher limit lets you qualify for a larger loan, but it also leaves less cushion for savings and unexpected costs. Many buyers deliberately borrow below their maximum.</p>
+    </details>
+    <details>
+      <summary>Are property taxes and insurance included?</summary>
+      <p>Yes. The maximum payment shown is a full PITI estimate — principal, interest, property tax and home insurance — so the resulting price reflects your true monthly cost.</p>
+    </details>
+    <details>
+      <summary>Is this financial advice?</summary>
+      <p>No. This tool is for informational purposes only. Your actual approval depends on your credit, employment, assets and lender guidelines. Confirm figures with a licensed professional.</p>
+    </details>
+  </section></div></div>
+
+  <main class="container">
+  <section class="block" style="border-top:none">
+    <div class="block__head"><h2>Related calculators</h2></div>
+    <div class="rel">
+      <a href="mortgage-calculator.html"><h4>Mortgage</h4><p>Estimate the full monthly payment on a specific home price.</p></a>
+      <a href="refinance-calculator.html"><h4>Refinance</h4><p>Find your break-even point and lifetime savings from refinancing.</p></a>
+      <a href="rent-vs-buy.html"><h4>Rent vs buy</h4><p>Compare the true cost of renting against owning over ten years.</p></a>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="container">
+  <div class="footer__grid">
+    <div>
+      <a href="../index.html" class="brand">RealEstate<em>Tools</em></a>
+      <p class="footer__lead">Free calculators and clear resources for smarter US real estate decisions.</p>
+    </div>
+    <div><h4>Calculators</h4>
+      <a href="mortgage-calculator.html">Mortgage</a>
+      <a href="affordability-calculator.html">Affordability</a>
+      <a href="refinance-calculator.html">Refinance</a>
+      <a href="rent-vs-buy.html">Rent vs buy</a>
+    </div>
+    <div><h4>Resources</h4>
+      <a href="../guias/">Guides</a>
+      <a href="../blog/">Blog</a>
+      <a href="../glosario/">Glossary</a>
+    </div>
+    <div><h4>Legal</h4>
+      <a href="../legal/privacy-policy.html">Privacy Policy</a>
+      <a href="../legal/terms-of-use.html">Terms of Use</a>
+      <a href="../legal/disclaimer.html">Disclaimer</a>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <p><b>Disclaimer:</b> These calculators are for informational purposes only and do not constitute financial, legal, or tax advice. Consult a qualified professional before making financial decisions.</p>
+    <p style="margin-top:6px">© <span id="year">2026</span> RealEstateTools. All rights reserved.</p>
+  </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n)};
+  var _moneyPrev={};
+  function animateMoney(el,target,suffixHTML){
+    if(!el)return;
+    var key=el.id||'x'; var start=_moneyPrev[key]||0; _moneyPrev[key]=target;
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches){el.innerHTML=fmt(target)+(suffixHTML||'');return;}
+    var dur=600,t0=null;
+    function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);var e=1-Math.pow(1-p,3);el.innerHTML=fmt(Math.round(start+(target-start)*e))+(suffixHTML||'');if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+
+  var incN=$('incN'),incR=$('incR'),debtN=$('debtN'),debtR=$('debtR'),dpN=$('dpN'),dpR=$('dpR'),
+      rateN=$('rateN'),termN=$('termN'),taxN=$('taxN'),insN=$('insN'),dtiR=$('dtiR');
+  function num(el,d){var v=parseFloat(String(el.value).replace(/,/g,''));return isNaN(v)?d:v;}
+  function formatMoney(el){var raw=String(el.value).replace(/[^\d]/g,'');if(raw===''){el.value='';return;}var atEnd=el.selectionStart===el.value.length;el.value=Number(raw).toLocaleString('en-US');if(atEnd){try{el.selectionStart=el.selectionEnd=el.value.length;}catch(e){}}}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-money]'),function(el){el.addEventListener('input',function(){formatMoney(el);});});
+
+  function compute(){
+    var income=Math.max(0,num(incN,0)), debts=Math.max(0,num(debtN,0)), dp=Math.max(0,num(dpN,0));
+    var rate=num(rateN,0), term=Math.max(1,num(termN,30));
+    var taxRate=num(taxN,0)/100, insYr=num(insN,0), dti=num(dtiR,36)/100;
+
+    var monthlyIncome=income/12;
+    var maxTotalDebt=monthlyIncome*dti;
+    var maxHousing=Math.max(0,maxTotalDebt-debts);   // full PITI budget
+
+    // reverse: PITI = PI + tax + ins. tax = price*taxRate/12, ins=insYr/12.
+    // price = loan + dp; loan = PI / piFactor. tax depends on price.
+    // Let piBudget be unknown; solve iteratively since tax scales with price.
+    var r=rate/100/12, n=Math.round(term*12);
+    var piFactor = r===0 ? 1/n : (r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1); // PI per $1 loan
+    var insM=insYr/12;
+
+    // iterate: guess price -> tax -> pi budget -> loan -> price
+    var price=dp; // start
+    for(var i=0;i<40;i++){
+      var taxM=price*taxRate/12;
+      var piBudget=Math.max(0,maxHousing-taxM-insM);
+      var loan=piBudget/piFactor;
+      var newPrice=loan+dp;
+      if(Math.abs(newPrice-price)<1){price=newPrice;break;}
+      price=newPrice;
+    }
+    var loan=Math.max(0,price-dp);
+    var pi=loan*piFactor;
+    var taxM=price*taxRate/12;
+    var piti=pi+taxM+insM;
+    var realDti=income>0?((piti+debts)/monthlyIncome*100):0;
+
+    // labels
+    $('incV').textContent=fmt(income);
+    $('dtiV').textContent=Math.round(dti*100)+'%';
+    animateMoney($('priceOut'),price,'');
+    $('dpNote').textContent=fmt(dp);
+    $('loanNote').textContent=fmt(loan);
+    $('payOut').textContent=fmt(piti);
+    $('piOut').textContent=fmt(pi);
+    $('taxOut').textContent=fmt(taxM);
+    $('insOut').textContent=fmt(insM);
+    $('realDti').textContent=Math.round(realDti)+'%';
+    $('limitLabel').textContent=Math.round(dti*100)+'%';
+    // mobile sticky bar
+    $('moPrice').textContent=fmt(price);
+    $('moPay').textContent=fmt(piti);
+    $('moDti').textContent=Math.round(realDti)+'%';
+
+    // DTI bar
+    var housingPct=income>0?Math.min(100,piti/monthlyIncome*100):0;
+    var debtPct=income>0?Math.min(100,debts/monthlyIncome*100):0;
+    $('barHousing').style.width=housingPct+'%';
+    $('barDebt').style.width=debtPct+'%';
+
+    // tag
+    var tag=$('tag');
+    if(price<=dp+1000){
+      tag.className='tagline warn';
+      tag.textContent='Your monthly debts use up the available budget at this income and DTI. Lowering debts or raising income increases what you can afford.';
+    }else if(dti>0.43){
+      tag.className='tagline warn';
+      tag.textContent='This DTI is above the 43% many lenders prefer. Qualifying is possible but leaves a thin budget cushion.';
+    }else{
+      tag.className='tagline ok';
+      tag.textContent='This estimate keeps your total debt within the '+Math.round(dti*100)+'% limit lenders commonly use.';
+    }
+
+    // sync sliders
+    incR.value=Math.min(incR.max,Math.max(incR.min,income));
+    debtR.value=Math.min(debtR.max,Math.max(debtR.min,debts));
+    dpR.value=Math.min(dpR.max,Math.max(dpR.min,dp));
+  }
+
+  incN.addEventListener('input',compute);
+  incR.addEventListener('input',function(){incN.value=Number(incR.value).toLocaleString('en-US');compute();});
+  debtN.addEventListener('input',compute);
+  debtR.addEventListener('input',function(){debtN.value=Number(debtR.value).toLocaleString('en-US');compute();});
+  dpN.addEventListener('input',compute);
+  dpR.addEventListener('input',function(){dpN.value=Number(dpR.value).toLocaleString('en-US');compute();});
+  [rateN,termN,taxN,insN,dtiR].forEach(function(el){el.addEventListener('input',compute);});
+
+  var b=document.querySelector('.burger'),nav=document.querySelector('.nav');
+  if(b&&nav){b.addEventListener('click',function(){var o=nav.classList.toggle('open');b.setAttribute('aria-expanded',o)});}
+  $('year').textContent=new Date().getFullYear();
+
+  // --- PDF download (visual capture of the result card) ---
+  (function(){
+   var pdfBtn=document.getElementById('pdfBtn');
+   if(pdfBtn){pdfBtn.addEventListener('click',function(){
+    if(typeof html2canvas==='undefined'||!window.jspdf){alert('Preparing tools, please try again in a moment.');return;}
+    pdfBtn.disabled=true; var label=pdfBtn.innerHTML; pdfBtn.textContent='Generating…';
+    var card=document.getElementById('resultCard');
+    html2canvas(card,{scale:2,backgroundColor:'#ffffff'}).then(function(canvas){
+      var img=canvas.toDataURL('image/png');
+      var pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+      var pw=pdf.internal.pageSize.getWidth(); var margin=40, maxW=pw-margin*2;
+      var ratio=canvas.height/canvas.width; var imgW=maxW, imgH=maxW*ratio;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(20,23,26);
+      pdf.text('RealEstateTools — Affordability estimate',margin,50);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,120);
+      pdf.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),margin,66);
+      pdf.addImage(img,'PNG',margin,84,imgW,imgH);
+      pdf.setFontSize(8); pdf.setTextColor(140,140,140);
+      pdf.text('For informational purposes only. Not financial advice. realestatetools.com',margin,84+imgH+24);
+      pdf.save('affordability-estimate.pdf'); pdfBtn.disabled=false; pdfBtn.innerHTML=label;
+    }).catch(function(){pdfBtn.disabled=false; pdfBtn.innerHTML=label; alert('Could not generate the PDF.');});
+   });}
+   var waBtn=document.getElementById('waBtn');
+   if(waBtn){waBtn.addEventListener('click',function(){
+    var g=function(id){var e=document.getElementById(id);return e?e.textContent.replace(/\\s+/g,' ').trim():'';};
+    var url=window.location.href.split('#')[0];
+    var msg='*Affordability estimate — RealEstateTools*\n\n'+'• You can afford up to: '+g('priceOut')+'\n'+'• Max monthly (PITI): '+g('payOut')+'\n'+'• Your DTI: '+g('realDti')+'\n\nRun your own numbers here:\n'+url;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+   });}
+  })();
+
+  compute();
+})();
+</script>
+</body>
+</html>
