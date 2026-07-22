@@ -7,7 +7,10 @@
 <meta name="description" content="Free mortgage and real estate calculators for US buyers and investors. Estimate monthly payments, affordability, refinance savings and returns instantly — no signup.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
 <style>
 /* ===== TOKENS ===== */
 :root{
@@ -32,8 +35,9 @@
 
   --r:4px; --rc:6px;
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;--s9:80px;
-  --sans:'Inter',system-ui,-apple-system,sans-serif;
-  --serif:'Newsreader',Georgia,'Times New Roman',serif;
+  --sans:'Geist',system-ui,-apple-system,sans-serif;
+  --serif:'Bricolage Grotesque','Geist',sans-serif;
+  --steel:#3D5A6C;--steel-deep:#1D3D4D;--steel-soft:#5C7A88;--steel-bg:#F0F4F5;
   --max:1160px;--hh:66px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -51,8 +55,8 @@ ul{list-style:none}
 /* ===== HEADER ===== */
 .header{position:sticky;top:0;z-index:50;height:var(--hh);background:rgba(255,255,255,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .header__in{height:100%;display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:baseline;gap:2px;font-family:var(--serif);font-size:1.35rem;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
-.brand em{font-style:italic;color:var(--forest)}
+.brand{display:flex;align-items:baseline;gap:2px;font-family:var(--serif);font-size:1.3rem;font-weight:700;letter-spacing:-.02em;color:var(--ink)}
+.brand em{font-style:normal;color:var(--steel)}
 .nav{display:flex;align-items:center;gap:var(--s2)}
 .nav a{padding:6px 4px;font-size:.9rem;font-weight:500;color:var(--ink-2);transition:color .15s;border-bottom:1px solid transparent}
 .nav a:hover{color:var(--ink)}
@@ -144,22 +148,30 @@ ul{list-style:none}
 .trust p{color:var(--ink-2);font-size:.92rem}
 
 /* ===== FOOTER ===== */
-.footer{padding-block:var(--s8) var(--s6)}
-.footer__grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:var(--s6)}
-@media(max-width:820px){.footer__grid{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.footer__grid{grid-template-columns:1fr}}
-.footer h4{font-size:.7rem;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-3);margin-bottom:var(--s4);font-weight:600}
-.footer a{color:var(--ink-2);font-size:.92rem;display:block;padding:5px 0;transition:color .15s}
-.footer a:hover{color:var(--forest)}
-.footer__lead{color:var(--ink-2);font-size:.92rem;max-width:30ch;margin-top:var(--s3)}
-.footer__bottom{margin-top:var(--s7);padding-top:var(--s5);border-top:1px solid var(--line);color:var(--ink-3);font-size:.8rem}
-.footer__bottom b{color:var(--ink-2)}
 
 .up{opacity:0;transform:translateY(12px);animation:up .55s cubic-bezier(.2,.7,.3,1) forwards}
 .up-2{animation-delay:.08s}
 @keyframes up{to{opacity:1;transform:none}}
+.footer{background:var(--forest);color:#fff;padding-block:var(--s6) var(--s5);margin-top:var(--s8)}
+.footer__grid{display:grid;grid-template-columns:1.8fr 1fr 1fr 1fr;gap:var(--s5) var(--s6)}
+@media(max-width:640px){.footer__grid{grid-template-columns:1fr 1fr 1fr;gap:var(--s5) var(--s4)}.footer__brand{grid-column:1/-1}}
+.footer h4{font-size:.68rem;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.5);margin-bottom:var(--s3);font-weight:600}
+.footer a{color:rgba(255,255,255,.75);font-size:.9rem;display:block;padding:4px 0;transition:color .15s}
+.footer a:hover{color:#fff}
+.footer .brand{color:#fff}
+.footer .brand em{color:#9DC3B0}
+.footer__lead{color:rgba(255,255,255,.65);font-size:.88rem;max-width:32ch;margin-top:var(--s3);line-height:1.55}
+.footer__bottom{margin-top:var(--s5);padding-top:var(--s4);border-top:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);font-size:.78rem;line-height:1.5}
+.footer__bottom b{color:rgba(255,255,255,.8)}
 :focus-visible{outline:2px solid var(--forest);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.up{opacity:1;transform:none}}
+.actions{display:flex;gap:12px;margin-top:16px}
+.abtn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 14px;border-radius:6px;font-size:.875rem;font-weight:600;border:1.5px solid var(--line-2,#D3D5D3);background:#fff;color:var(--ink,#14171A);cursor:pointer;font-family:inherit;transition:.15s}
+.abtn:hover{background:#2E4B3C;border-color:#2E4B3C;color:#fff}
+.abtn svg{width:17px;height:17px}
+.abtn--wa{background:#25D366;border-color:#25D366;color:#fff}
+.abtn--wa:hover{background:#1EBE5A;border-color:#1EBE5A}
+.abtn[disabled]{opacity:.6;cursor:wait}
 </style>
 </head>
 <body>
@@ -191,7 +203,7 @@ ul{list-style:none}
       <div class="controls">
         <div class="field">
           <div class="field__top"><label class="field__label" for="priceN">Home price</label><span class="field__val num" id="priceV">$360,000</span></div>
-          <div class="inp"><span class="inp__pre">$</span><input type="number" id="priceN" value="360000" min="20000" max="3000000" step="5000"></div>
+          <div class="inp"><span class="inp__pre">$</span><input type="text" inputmode="numeric" data-money id="priceN" value="360,000"></div>
           <input type="range" class="range" id="priceR" value="360000" min="50000" max="1500000" step="5000" aria-label="Home price">
         </div>
         <div class="field">
@@ -211,7 +223,7 @@ ul{list-style:none}
     </div>
 
     <div class="up up-2">
-      <div class="result">
+      <div class="result" id="resultCard">
         <div class="result__head">
           <span class="result__label">Estimated monthly payment</span>
           <div class="result__pay num" id="payOut">$2,300</div>
@@ -228,6 +240,16 @@ ul{list-style:none}
           <span class="result__meta">Loan <b class="num" id="loanOut">$288,000</b> · Total interest <b class="num" id="intOut">$367,000</b></span>
           <a class="link" href="calculadoras/mortgage-calculator.html">Full schedule <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
         </div>
+      </div>
+      <div class="actions">
+        <button class="abtn" id="pdfBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v4a1 1 0 0 0 1 1h4M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5z" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13h6M9 17h4" stroke-linecap="round"/></svg>
+          Download PDF
+        </button>
+        <button class="abtn abtn--wa" id="waBtn" type="button">
+          <svg viewBox="0 0 32 32" fill="currentColor"><path d="M16.004 0h-.008C7.174 0 .003 7.173.003 16c0 3.5 1.128 6.744 3.046 9.377L1.05 31.28l6.106-1.953A15.9 15.9 0 0 0 16.004 32C24.83 32 32 24.826 32 16S24.83 0 16.004 0zm9.318 22.594c-.386 1.09-1.918 1.994-3.14 2.258-.836.178-1.928.32-5.604-1.204-4.7-1.946-7.726-6.72-7.962-7.03-.226-.31-1.9-2.53-1.9-4.826s1.166-3.42 1.636-3.9c.386-.394.98-.574 1.55-.574.184 0 .35.01.5.017.446.02.67.046.964.748.366.882 1.256 3.078 1.362 3.302.108.224.216.526.064.836-.142.32-.268.454-.492.71-.226.256-.44.454-.664.73-.204.24-.434.498-.174.946.26.44 1.156 1.906 2.48 3.086 1.708 1.522 3.11 1.994 3.606 2.202.37.154.81.118 1.08-.17.342-.37.764-.984 1.194-1.59.304-.434.69-.488 1.094-.336.412.144 2.598 1.226 3.046 1.45.448.222.744.33.854.516.108.186.108 1.072-.278 2.162z"/></svg>
+          Share
+        </button>
       </div>
     </div>
   </div>
@@ -278,7 +300,8 @@ ul{list-style:none}
 </section>
 </main>
 
-<footer class="footer container">
+<footer class="footer">
+  <div class="container">
   <div class="footer__grid">
     <div>
       <a href="index.html" class="brand">RealEstate<em>Tools</em></a>
@@ -305,12 +328,22 @@ ul{list-style:none}
     <p><b>Disclaimer:</b> These calculators are for informational purposes only and do not constitute financial, legal, or tax advice. Consult a qualified professional before making financial decisions.</p>
     <p style="margin-top:6px">© <span id="year">2026</span> RealEstateTools. All rights reserved.</p>
   </div>
+  </div>
 </footer>
 
 <script>
 (function(){
   var $=function(id){return document.getElementById(id)};
   var fmt=function(n){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n)};
+  var _moneyPrev={};
+  function animateMoney(el,target,suffixHTML){
+    if(!el)return;var key=el.id||'x';var start=_moneyPrev[key]||0;_moneyPrev[key]=target;
+    if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches){el.innerHTML=fmt(target)+(suffixHTML||'');return;}
+    var dur=600,t0=null;function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur);var e=1-Math.pow(1-p,3);el.innerHTML=fmt(Math.round(start+(target-start)*e))+(suffixHTML||'');if(p<1)requestAnimationFrame(step);}
+    requestAnimationFrame(step);
+  }
+  function formatMoney(el){var raw=String(el.value).replace(/[^\d]/g,'');if(raw===''){el.value='';return;}var atEnd=el.selectionStart===el.value.length;el.value=Number(raw).toLocaleString('en-US');if(atEnd){try{el.selectionStart=el.selectionEnd=el.value.length;}catch(e){}}}
+  Array.prototype.forEach.call(document.querySelectorAll('[data-money]'),function(el){el.addEventListener('input',function(){formatMoney(el);});});
   var price=360000,downPct=20,rate=6.5,term=30,taxRate=0.011,insYr=1800;
   var priceN=$('priceN'),priceR=$('priceR'),downR=$('downR'),rateR=$('rateR'),termR=$('termR');
 
@@ -323,7 +356,7 @@ ul{list-style:none}
     $('downV').textContent=downPct+'% · '+fmt(down);
     $('rateV').textContent=rate.toFixed(2)+'%';
     $('termV').textContent=term+' years';
-    $('payOut').textContent=fmt(total);
+    animateMoney($('payOut'),total,'');
     $('piOut').textContent=fmt(pi);
     $('taxOut').textContent=fmt(tax);
     $('insOut').textContent=fmt(ins);
@@ -347,14 +380,48 @@ ul{list-style:none}
     s+='<text x="'+cx+'" y="'+(cy+18)+'" text-anchor="middle" fill="#8B9198" font-family="Inter,sans-serif" font-size="8.5" font-weight="600" letter-spacing="1.2">P &amp; I</text>';
     $('chart').innerHTML='<svg viewBox="0 0 '+size+' '+size+'" width="'+size+'" height="'+size+'" role="img" aria-label="Payment breakdown">'+s+'</svg>';
   }
-  priceN.addEventListener('input',function(){price=Math.max(20000,+priceN.value||0);priceR.value=Math.min(priceR.max,price);calc()});
-  priceR.addEventListener('input',function(){price=+priceR.value;priceN.value=price;calc()});
+  priceN.addEventListener('input',function(){price=Math.max(0,parseFloat(String(priceN.value).replace(/,/g,''))||0);priceR.value=Math.min(priceR.max,Math.max(priceR.min,price));calc()});
+  priceR.addEventListener('input',function(){price=+priceR.value;priceN.value=Number(price).toLocaleString('en-US');calc()});
   downR.addEventListener('input',function(){downPct=+downR.value;calc()});
   rateR.addEventListener('input',function(){rate=+rateR.value;calc()});
   termR.addEventListener('input',function(){term=+termR.value;calc()});
   var b=document.querySelector('.burger'),nav=document.querySelector('.nav');
   if(b&&nav){b.addEventListener('click',function(){var o=nav.classList.toggle('open');b.setAttribute('aria-expanded',o)});}
   $('year').textContent=new Date().getFullYear();
+  (function(){
+   var pdfBtn=document.getElementById('pdfBtn');
+   if(pdfBtn){pdfBtn.addEventListener('click',function(){
+    if(typeof html2canvas==='undefined'||!window.jspdf){alert('Preparing tools, please try again in a moment.');return;}
+    pdfBtn.disabled=true; var label=pdfBtn.innerHTML; pdfBtn.textContent='Generating…';
+    var card=document.getElementById('resultCard');
+    html2canvas(card,{scale:2,backgroundColor:'#ffffff'}).then(function(canvas){
+      var img=canvas.toDataURL('image/png');
+      var pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'});
+      var pw=pdf.internal.pageSize.getWidth(); var margin=40, maxW=pw-margin*2;
+      var ratio=canvas.height/canvas.width; var imgW=maxW, imgH=maxW*ratio;
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(16); pdf.setTextColor(20,23,26);
+      pdf.text('RealEstateTools — Mortgage estimate',margin,50);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9); pdf.setTextColor(120,120,120);
+      pdf.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}),margin,66);
+      pdf.addImage(img,'PNG',margin,84,imgW,imgH);
+      pdf.setFontSize(8); pdf.setTextColor(140,140,140);
+      pdf.text('For informational purposes only. Not financial advice. realestatetools.com',margin,84+imgH+24);
+      pdf.save('mortgage-estimate.pdf'); pdfBtn.disabled=false; pdfBtn.innerHTML=label;
+    }).catch(function(){pdfBtn.disabled=false; pdfBtn.innerHTML=label; alert('Could not generate the PDF.');});
+   });}
+   var waBtn=document.getElementById('waBtn');
+   if(waBtn){waBtn.addEventListener('click',function(){
+    var g=function(id){var e=document.getElementById(id);return e?e.textContent.replace(/\s+/g,' ').trim():'';};
+    var url=window.location.href.split('#')[0];
+    var msg='*Mortgage estimate — RealEstateTools*\n\n'+
+      '• Monthly payment: '+g('payOut')+'\n'+
+      '• Principal & interest: '+g('piOut')+'\n'+
+      '• Loan: '+g('loanOut')+
+      '\n\nRun your own numbers here:\n'+url;
+    window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+   });}
+  })();
+
   calc();
 })();
 </script>
